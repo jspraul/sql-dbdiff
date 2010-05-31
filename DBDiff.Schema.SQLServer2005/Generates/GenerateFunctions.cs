@@ -124,8 +124,8 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
                                             if (itemC.ReturnType.Size != -1)
                                                 itemC.ReturnType.Size = itemC.ReturnType.Size / 2;
                                         }
-                                        if (reader["type"].ToString().Trim().Equals("AF")) itemC.AggregateFunction = true;
-                                        else itemC.AggregateFunction = false;
+                                        if (reader["type"].ToString().Trim().Equals("AF")) itemC.IsAggregateFunction = true;
+                                        else itemC.IsAggregateFunction = false;
                                         database.CLRFunctions.Add(itemC);
                                         lastViewId = itemC.Id;
                                     }
