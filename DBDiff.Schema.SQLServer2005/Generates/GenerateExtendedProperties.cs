@@ -44,6 +44,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
             if (type.Equals("FN")) return "FUNCTION";
             if (type.Equals("IF")) return "FUNCTION";
             if (type.Equals("TF")) return "FUNCTION";
+            if (type.Equals("AF")) return "FUNCTION";
             return "";
         }
 

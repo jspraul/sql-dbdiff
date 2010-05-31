@@ -15,6 +15,33 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands
             return "";
         }
 
+		private static string Get2000()
+        {
+            string sql = "";
+            sql += "select distinct ";
+            sql += "--T.name AS ReturnType, PP.max_length, PP.precision, PP.Scale, ";
+            sql += "--ISNULL(CONVERT(varchar,AM.execute_as_principal_id),'CALLER') as ExecuteAs,"; 
+            sql += "P.xtype, ";
+            sql += "--AF.name AS assembly_name, ";
+            sql += "--AM.assembly_class,";
+            sql += "--AM.assembly_id, ";
+            sql += "--AM.assembly_method, ";
+            sql += "ISNULL('[' + S3.Name + '].[' + object_name(D2.id) + ']','') AS DependOut, '[' + S2.Name + '].[' + object_name(D.depid) + ']' AS TableName, D.depid, OBJECTPROPERTY (P.id,'IsSchemaBound') AS IsSchemaBound, P.id, S.name as owner, P.name as name from sysobjects P ";
+            sql += "INNER JOIN sysusers S ON S.uid = P.uid ";
+            sql += "LEFT JOIN sysdepends D ON P.id = D.id ";
+            sql += "LEFT JOIN sysobjects O ON O.id = D.depid ";
+            sql += "LEFT JOIN sysusers S2 ON S2.uid = O.uid ";
+            sql += "LEFT JOIN sysdepends D2 ON P.id = D2.depid ";
+            sql += "LEFT JOIN sysobjects O2 ON O2.id = D2.id ";
+            sql += "LEFT JOIN sysusers S3 ON S3.uid = O2.uid ";
+            sql += "--LEFT JOIN sys.assembly_modules AM ON AM.object_id = P.id  ";
+            sql += "--LEFT JOIN sys.assemblies AF ON AF.assembly_id = AM.assembly_id ";
+            sql += "--LEFT JOIN sys.parameters PP ON PP.object_id = AM.object_id AND PP.parameter_id = 0 and PP.is_output = 1 ";
+            sql += "--LEFT JOIN sys.types T ON T.system_type_id = PP.system_type_id ";
+            sql += "WHERE P.xtype IN ('IF','FN','TF','FS') ORDER BY P.id";
+            return sql;
+        }
+		
         private static string Get2005()
         {
             string sql = "";
@@ -38,7 +65,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands
             sql += "LEFT JOIN sys.assemblies AF ON AF.assembly_id = AM.assembly_id ";
             sql += "LEFT JOIN sys.parameters PP ON PP.object_id = AM.object_id AND PP.parameter_id = 0 and PP.is_output = 1 ";
             sql += "LEFT JOIN sys.types T ON T.system_type_id = PP.system_type_id ";
-            sql += "WHERE P.type IN ('IF','FN','TF','FS') ORDER BY P.object_id";
+            sql += "WHERE P.type IN ('IF','FN','TF','FS','AF') ORDER BY P.object_id";
             return sql;
         }
 
@@ -65,7 +92,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands
             sql += "LEFT JOIN sys.assemblies AF ON AF.assembly_id = AM.assembly_id ";
             sql += "LEFT JOIN sys.parameters PP ON PP.object_id = AM.object_id AND PP.parameter_id = 0 and PP.is_output = 1 ";
             sql += "LEFT JOIN sys.types T ON T.system_type_id = PP.system_type_id ";
-            sql += "WHERE P.type IN ('IF','FN','TF','FS') ORDER BY P.object_id";
+            sql += "WHERE P.type IN ('IF','FN','TF','FS','AF') ORDER BY P.object_id";
             return sql;
         }
     }

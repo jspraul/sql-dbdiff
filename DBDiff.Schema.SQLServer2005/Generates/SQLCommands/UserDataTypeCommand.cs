@@ -49,7 +49,18 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands
 
         public static string Get2000()
         {
-            return "";
+            string sql = "select '' AS assembly_name, 0 AS assembly_id, '' AS assembly_class, T.length, S2.name as defaultowner, O2.name as defaultname, S1.name as ruleowner, O.name as rulename, ISNULL(T2.Name,'') AS basetypename, S.Name AS Owner, T.Name, 0 as is_assembly_type, T.xusertype AS tid, T.allownulls as is_nullable, T.xprec as precision, T.xscale"; 
+			sql += " from systypes T ";
+			sql += " INNER JOIN sysusers S ON S.uid = T.uid "; 
+			sql += " LEFT JOIN systypes T2 ON T2.xusertype = T.xtype "; 
+			sql += " LEFT JOIN sysobjects O ON O.type = 'R' and O.id = T.domain ";
+			sql += " LEFT JOIN sysusers S1 ON S1.uid = O.uid  ";
+			sql += " LEFT JOIN sysobjects O2 ON O2.type = 'D' and O2.id = T.tdefault ";
+			sql += " LEFT JOIN sysusers S2 ON S2.uid = O2.uid  ";
+			sql += " --LEFT JOIN sys.assembly_types AT ON AT.user_type_id = T.xusertype AND T.is_assembly_type = 1  ";
+			sql += " --LEFT JOIN sys.assemblies AF ON AF.assembly_id = AT.assembly_id ";
+			sql += " WHERE T.uid = 1 ORDER BY T.Name";
+            return sql;
         }
     }
 }

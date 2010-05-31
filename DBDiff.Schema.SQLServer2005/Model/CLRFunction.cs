@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
@@ -10,18 +9,25 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
     {
         private List<Parameter> parameters;
         private Parameter returnType;
-
+        private bool isAggrFunc;
         public CLRFunction(ISchemaBase parent)
             : base(parent, Enums.ObjectType.CLRFunction, Enums.ScripActionType.AddFunction, Enums.ScripActionType.DropFunction)
         {
             parameters = new List<Parameter>();
             returnType = new Parameter();
+            isAggrFunc = false;
         }
 
         public List<Parameter> Parameters
         {
             get { return parameters; }
             set { parameters = value; }
+        }
+
+        public bool IsAggregateFunction
+        {
+            get { return isAggrFunc; }
+            set { isAggrFunc = value; }
         }
 
         public Parameter ReturnType
@@ -31,7 +37,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
 
         public override string ToSql()
         {
-            string sql = "CREATE FUNCTION " + FullName + "";
+            string sql = "CREATE " + (isAggrFunc ? "AGGREGATE " : "FUNCTION ") + FullName + "";
             string param = "";
             parameters.ForEach(item => param += item.ToSql() + ",");
             if (!String.IsNullOrEmpty(param))
@@ -42,9 +48,8 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
             else
                 sql += "()\r\n";
             sql += "RETURNS " + returnType.ToSql() + " ";
-            sql += "WITH EXECUTE AS " + AssemblyExecuteAs + "\r\n";
-            sql += "AS\r\n";
-            sql += "EXTERNAL NAME [" + AssemblyName + "].[" + AssemblyClass + "].[" + AssemblyMethod + "]\r\n";
+            if (!isAggrFunc) sql += "WITH EXECUTE AS " + AssemblyExecuteAs + "\r\n"+ "AS\r\n";
+            sql += "EXTERNAL NAME [" + AssemblyName + "]" + (AssemblyClass == "" ? "" : ".[" + AssemblyClass + "]") + (AssemblyMethod == "" ? "" : ".[" + AssemblyMethod + "]") + "\r\n";
             sql += "GO\r\n";
             return sql;
         }

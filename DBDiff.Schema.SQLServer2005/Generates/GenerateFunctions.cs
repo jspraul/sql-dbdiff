@@ -26,7 +26,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
             sql += "select AP.is_output, AP.scale, AP.precision, '[' + SCHEMA_NAME(O.schema_id) + '].['+  O.name + ']' AS ObjectName, AP.name, TT.name AS TypeName, AP.max_length from sys.all_parameters AP ";
             sql += "INNER JOIN sys.types TT ON TT.user_type_id = AP.user_type_id ";
             sql += "INNER JOIN sys.objects O ON O.object_id = AP.object_id ";
-            sql += "WHERE type = 'FS' AND AP.name <> '' ORDER BY O.object_id, AP.parameter_id ";
+            sql += "WHERE type in ('FS','AF') AND AP.name <> '' ORDER BY O.object_id, AP.parameter_id ";
             return sql;
         }
 
@@ -79,7 +79,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
                             CLRFunction itemC = null;
                             while (reader.Read())
                             {
-                                if ((!reader["type"].ToString().Trim().Equals("FS")) && (database.Options.Ignore.FilterFunction))
+                                if ((!reader["type"].ToString().Trim().Equals("FS") && !reader["type"].ToString().Trim().Equals("AF")) && (database.Options.Ignore.FilterFunction))
                                 {
                                     if (lastViewId != (int)reader["object_id"])
                                     {
@@ -101,7 +101,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
                                             itemF.DependenciesOut.Add(reader["DependOut"].ToString());
                                     }
                                 }
-                                if ((reader["type"].ToString().Trim().Equals("FS")) && (database.Options.Ignore.FilterCLRFunction))
+                                if ((reader["type"].ToString().Trim().Equals("FS") || reader["type"].ToString().Trim().Equals("AF")) && (database.Options.Ignore.FilterCLRFunction))
                                 {
                                     itemC = new CLRFunction(database);
                                     if (lastViewId != (int)reader["object_id"])
@@ -124,6 +124,8 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
                                             if (itemC.ReturnType.Size != -1)
                                                 itemC.ReturnType.Size = itemC.ReturnType.Size / 2;
                                         }
+                                        if (reader["type"].ToString().Trim().Equals("AF")) itemC.AggregateFunction = true;
+                                        else itemC.AggregateFunction = false;
                                         database.CLRFunctions.Add(itemC);
                                         lastViewId = itemC.Id;
                                     }

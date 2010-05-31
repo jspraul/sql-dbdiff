@@ -68,7 +68,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
                                     if (type.Equals("P"))
                                         code = (ICode)database.Procedures.Find(id);
 
-                                    if (type.Equals("IF") || type.Equals("FN") || type.Equals("TF"))
+                                    if (type.Equals("IF") || type.Equals("FN") || type.Equals("TF") || type.Equals("AF"))
                                         code = (ICode)database.Functions.Find(id);
 
                                     if (code != null)
