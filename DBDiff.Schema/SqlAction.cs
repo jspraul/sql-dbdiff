@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+
 using DBDiff.Schema.Model;
+using System;
 
 namespace DBDiff.Schema
 {
+    
     public class SqlAction
     {
         private Enums.ObjectType type;

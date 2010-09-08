@@ -1,11 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using DBDiff.Schema.Model;
-using System.Collections;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class XMLSchema : SQLServerSchemaBase
     {
         private string text;

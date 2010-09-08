@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿
 using DBDiff.Schema.Model;
+using System;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class CLRTrigger : CLRCode
     {
         private bool isDelete;

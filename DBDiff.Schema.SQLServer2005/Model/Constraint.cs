@@ -1,11 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Globalization;
+using System.Text;
 using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+
+    
     public class Constraint : SQLServerSchemaBase
     {
         public enum ConstraintType
@@ -207,6 +208,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
         private string ToSQLGeneric(ConstraintType consType)
         {
             string typeConstraint = "";
+            bool sql2000 = ((Database)Parent.Parent).Info.Version == DatabaseInfo.VersionNumber.SQLServer2000;
             StringBuilder sql = new StringBuilder();
             if (Index.Type == Index.IndexTypeEnum.Clustered) typeConstraint = "CLUSTERED";
             if (Index.Type == Index.IndexTypeEnum.Nonclustered) typeConstraint = "NONCLUSTERED";
@@ -231,19 +233,34 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
                 sql.Append("\r\n");
             }
             sql.Append("\t)");
-            sql.Append(" WITH (");
-            if (Parent.ObjectType == Enums.ObjectType.TableType)
-                if (Index.IgnoreDupKey) sql.Append("IGNORE_DUP_KEY = ON "); else sql.Append("IGNORE_DUP_KEY  = OFF ");
+            
+            if (sql2000)
+            {
+                if (Parent.ObjectType != Enums.ObjectType.TableType)
+                    if (Index.FillFactor != 0)
+                    {
+                        sql.Append(" WITH ");
+                        sql.Append(" FILLFACTOR = " + Index.FillFactor.ToString(CultureInfo.InvariantCulture));
+                        sql.Append(" ");
+                    }
+            }
             else
             {
-                if (Index.IsPadded) sql.Append("PAD_INDEX = ON, "); else sql.Append("PAD_INDEX  = OFF, ");
-                if (Index.IsAutoStatistics) sql.Append("STATISTICS_NORECOMPUTE = ON, "); else sql.Append("STATISTICS_NORECOMPUTE  = OFF, ");
-                if (Index.IgnoreDupKey) sql.Append("IGNORE_DUP_KEY = ON, "); else sql.Append("IGNORE_DUP_KEY  = OFF, ");
-                if (Index.AllowRowLocks) sql.Append("ALLOW_ROW_LOCKS = ON, "); else sql.Append("ALLOW_ROW_LOCKS  = OFF, ");
-                if (Index.AllowPageLocks) sql.Append("ALLOW_PAGE_LOCKS = ON"); else sql.Append("ALLOW_PAGE_LOCKS  = OFF");
-                if (Index.FillFactor != 0) sql.Append(", FILLFACTOR = " + Index.FillFactor.ToString(CultureInfo.InvariantCulture));
+                sql.Append(" WITH (");
+                if (Parent.ObjectType == Enums.ObjectType.TableType)
+                    if (Index.IgnoreDupKey) sql.Append("IGNORE_DUP_KEY = ON "); else sql.Append("IGNORE_DUP_KEY  = OFF ");
+                else
+                {
+                    if (Index.IsPadded) sql.Append("PAD_INDEX = ON, "); else sql.Append("PAD_INDEX  = OFF, ");
+                    if (Index.IsAutoStatistics) sql.Append("STATISTICS_NORECOMPUTE = ON, "); else sql.Append("STATISTICS_NORECOMPUTE  = OFF, ");
+                    if (Index.IgnoreDupKey) sql.Append("IGNORE_DUP_KEY = ON, "); else sql.Append("IGNORE_DUP_KEY  = OFF, ");
+                    if (Index.AllowRowLocks) sql.Append("ALLOW_ROW_LOCKS = ON, "); else sql.Append("ALLOW_ROW_LOCKS  = OFF, ");
+                    if (Index.AllowPageLocks) sql.Append("ALLOW_PAGE_LOCKS = ON"); else sql.Append("ALLOW_PAGE_LOCKS  = OFF");
+                    if (Index.FillFactor != 0) sql.Append(", FILLFACTOR = " + Index.FillFactor.ToString(CultureInfo.InvariantCulture));
+                }
+                sql.Append(")");
             }
-            sql.Append(")");
+            
             if (!String.IsNullOrEmpty(Index.FileGroup)) sql.Append(" ON [" + Index.FileGroup + "]");
             return sql.ToString();
         }

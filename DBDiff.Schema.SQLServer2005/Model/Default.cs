@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using DBDiff.Schema.Model;
+using System;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+
+    
     public class Default:SQLServerSchemaBase 
     {
         private string value;
@@ -56,7 +56,8 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
 
         public override string ToSql()
         {
-            return "";
+            //return "CREATE DEFAULT " + FullName + " AS "+value+"\r\nGO\r\n";
+            return value + "\r\nGO\r\n";
         }
 
         /// <summary>
@@ -80,6 +81,15 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
                 listDiff.Add(ToSql(), 0, Enums.ScripActionType.AddRule);
             }
             return listDiff;
+        }
+
+        public bool Compare(Default obj)
+        {
+            if (obj == null) throw new ArgumentNullException("obj");
+            if (Name != obj.Name) return false;
+            //if (Owner != obj.Owner) return false;
+            if (Value != obj.Value) return false;
+            return true;
         }
     }
 }

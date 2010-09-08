@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
 using DBDiff.Schema.Model;
 using DBDiff.Schema.SQLServer.Generates.Model.Util;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class StoreProcedure : Code 
     {
         public StoreProcedure(ISchemaBase parent)

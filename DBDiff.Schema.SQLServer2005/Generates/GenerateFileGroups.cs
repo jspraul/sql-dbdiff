@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Data.SqlClient;
-using DBDiff.Schema.SQLServer.Generates.Options;
 using DBDiff.Schema.SQLServer.Generates.Model;
+using DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands;
 
 namespace DBDiff.Schema.SQLServer.Generates.Generates
 {
@@ -16,27 +13,27 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
             this.root = root;
         }
 
-        private static string GetSQLFile(FileGroup filegroup)
-        {
-            string sql;
-            sql = "select file_id,";
-            sql += "type,";
-            sql += "name,";
-            sql += "physical_name,";
-            sql += "size,";
-            sql += "max_size,";
-            sql += "growth,";
-            sql += "is_sparse,";
-            sql += "is_percent_growth ";
-            sql += "from sys.database_files WHERE data_space_id = " + filegroup.Id.ToString();
-            return sql;
-        }
+        //private static string GetSQLFile(Database database,FileGroup filegroup)
+        //{
+        //    string sql;
+        //    sql = "select file_id,";
+        //    sql += "type,";
+        //    sql += "name,";
+        //    sql += "physical_name,";
+        //    sql += "size,";
+        //    sql += "max_size,";
+        //    sql += "growth,";
+        //    sql += "is_sparse,";
+        //    sql += "is_percent_growth ";
+        //    sql += "from sys.database_files WHERE data_space_id = " + filegroup.Id.ToString();
+        //    return sql;
+        //}
 
-        private static void FillFiles(FileGroup filegroup, string connectionString)
+        private static void FillFiles(Database database,FileGroup filegroup, string connectionString)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                using (SqlCommand command = new SqlCommand(GetSQLFile(filegroup), conn))
+                using (SqlCommand command = new SqlCommand(FileGroupSQLCommand.GetFilesInFileGroup(database.Info.Version,filegroup), conn))
                 {
                     conn.Open();
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -61,18 +58,18 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
             }
         }
 
-        private static string GetSQL()
-        {
-            string sql;
-            sql = "SELECT  ";
-            sql += "name, ";
-            sql += "data_space_id AS [ID], ";
-            sql += "is_default, ";
-            sql += "is_read_only, ";
-            sql += "type ";
-            sql += "FROM sys.filegroups ORDER BY name";
-            return sql;
-        }
+        //private static string GetSQL()
+        //{
+        //    string sql;
+        //    sql = "SELECT  ";
+        //    sql += "name, ";
+        //    sql += "data_space_id AS [ID], ";
+        //    sql += "is_default, ";
+        //    sql += "is_read_only, ";
+        //    sql += "type ";
+        //    sql += "FROM sys.filegroups ORDER BY name";
+        //    return sql;
+        //}
 
         public void Fill(Database database, string connectionString)
         {
@@ -82,7 +79,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
                 {
                     using (SqlConnection conn = new SqlConnection(connectionString))
                     {
-                        using (SqlCommand command = new SqlCommand(GetSQL(), conn))
+                        using (SqlCommand command = new SqlCommand(FileGroupSQLCommand.Get(database.Info.Version), conn))
                         {
                             conn.Open();
                             using (SqlDataReader reader = command.ExecuteReader())
@@ -96,7 +93,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
                                     item.IsDefaultFileGroup = (bool)reader["is_default"];
                                     item.IsReadOnly = (bool)reader["is_read_only"];
                                     item.IsFileStream = reader["type"].Equals("FD");
-                                    FillFiles(item,connectionString);
+                                    FillFiles(database,item, connectionString);
                                     database.FileGroups.Add(item);
                                 }
                             }

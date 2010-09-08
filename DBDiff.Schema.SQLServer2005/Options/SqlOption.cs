@@ -1,15 +1,19 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DBDiff.Schema.SQLServer.Generates.Options
 {
+    
     public class SqlOption
     {
+        
         private SqlOptionDefault defaults;
+        
         private SqlOptionIgnore ignore;
+        
         private SqlOptionScript script;
+        
         private SqlOptionFilter filters;
+        
         private SqlOptionComparison comparison;
 
         public SqlOption()

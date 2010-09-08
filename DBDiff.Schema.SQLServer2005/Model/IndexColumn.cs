@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class IndexColumn : SQLServerSchemaBase, IComparable<IndexColumn>
     {
         private Boolean order;

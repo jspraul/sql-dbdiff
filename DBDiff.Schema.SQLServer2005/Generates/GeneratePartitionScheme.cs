@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿
 using System.Data.SqlClient;
 using DBDiff.Schema.SQLServer.Generates.Model;
 
@@ -33,6 +30,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
         {
             int lastObjectId = 0;
             PartitionScheme item = null;
+            if (database.Info.Version == DatabaseInfo.VersionNumber.SQLServer2000) return;
             if (database.Options.Ignore.FilterPartitionScheme)
             {
                 using (SqlConnection conn = new SqlConnection(connectioString))

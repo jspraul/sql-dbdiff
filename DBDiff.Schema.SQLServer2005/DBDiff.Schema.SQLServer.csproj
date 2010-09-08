@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -13,10 +14,11 @@
     <AssemblyOriginatorKeyFile>DBDiff.Schema.SQLServer.snk</AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
-    <OldToolsVersion>2.0</OldToolsVersion>
+    <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -29,9 +31,9 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,7 +43,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRules>-Microsoft.Naming#CA1702;-Microsoft.Naming#CA1700;-Microsoft.Naming#CA1712;-Microsoft.Naming#CA1713;-Microsoft.Naming#CA1714;-Microsoft.Naming#CA1709;-Microsoft.Naming#CA1704;-Microsoft.Naming#CA1708;-Microsoft.Naming#CA1715;-Microsoft.Naming#CA1710;-Microsoft.Naming#CA1720;-Microsoft.Naming#CA1707;-Microsoft.Naming#CA1722;-Microsoft.Naming#CA1711;-Microsoft.Naming#CA1716;-Microsoft.Naming#CA1717;-Microsoft.Naming#CA1725;-Microsoft.Naming#CA1719;-Microsoft.Naming#CA1721;-Microsoft.Naming#CA1701;-Microsoft.Naming#CA1703;-Microsoft.Naming#CA1724;-Microsoft.Naming#CA1726</CodeAnalysisRules>
+    <CodeAnalysisRules>
+    </CodeAnalysisRules>
+    <CodeAnalysisRuleSet>Migrated rules for DBDiff.Schema.SQLServer.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -50,21 +54,13 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRules>-Microsoft.Naming#CA1702;-Microsoft.Naming#CA1700;-Microsoft.Naming#CA1712;-Microsoft.Naming#CA1713;-Microsoft.Naming#CA1714;-Microsoft.Naming#CA1709;-Microsoft.Naming#CA1704;-Microsoft.Naming#CA1708;-Microsoft.Naming#CA1715;-Microsoft.Naming#CA1710;-Microsoft.Naming#CA1720;-Microsoft.Naming#CA1707;-Microsoft.Naming#CA1722;-Microsoft.Naming#CA1711;-Microsoft.Naming#CA1716;-Microsoft.Naming#CA1717;-Microsoft.Naming#CA1725;-Microsoft.Naming#CA1719;-Microsoft.Naming#CA1721;-Microsoft.Naming#CA1701;-Microsoft.Naming#CA1703;-Microsoft.Naming#CA1724;-Microsoft.Naming#CA1726</CodeAnalysisRules>
+    <CodeAnalysisRules>
+    </CodeAnalysisRules>
+    <CodeAnalysisRuleSet>Migrated rules for DBDiff.Schema.SQLServer.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="C5, Version=1.1.0.0, Culture=neutral, PublicKeyToken=06a1b38866503b69, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Componentes\C5.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -80,6 +76,7 @@
     <Compile Include="Compare\CompareColumnsConstraints.cs" />
     <Compile Include="Compare\CompareConstraints.cs" />
     <Compile Include="Compare\CompareDatabase.cs" />
+    <Compile Include="Compare\CompareDefaults.cs" />
     <Compile Include="Compare\CompareFileGroups.cs" />
     <Compile Include="Compare\CompareFullText.cs" />
     <Compile Include="Compare\CompareFullTextIndex.cs" />
@@ -106,7 +103,9 @@
     <Compile Include="Front\AddItem.Designer.cs">
       <DependentUpon>AddItem.cs</DependentUpon>
     </Compile>
-    <Compile Include="Front\HandlerHelper.cs" />
+    <Compile Include="Front\HandlerHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Front\SqlOptionsFront.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -119,7 +118,9 @@
     <Compile Include="Front\SqlServerConnectFront.Designer.cs">
       <DependentUpon>SqlServerConnectFront.cs</DependentUpon>
     </Compile>
-    <Compile Include="Front\Util\SqlServerList.cs" />
+    <Compile Include="Front\Util\SqlServerList.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Generates\Generate.cs" />
     <Compile Include="Generates\GenerateFullText.cs" />
     <Compile Include="Generates\GenerateFullTextIndex.cs" />
@@ -127,6 +128,17 @@
     <Compile Include="Generates\SQLCommands\DatabaseSQLCommand.cs" />
     <Compile Include="Generates\SQLCommands\FullTextIndexSQLCommand.cs" />
     <Compile Include="Generates\SQLCommands\FunctionSQLCommand.cs" />
+    <Compile Include="Generates\SQLCommands\RuleSQLCommand.cs" />
+    <Compile Include="Generates\SQLCommands\DefaultSQLCommand.cs" />
+    <Compile Include="Generates\SQLCommands\ForeignKeySQLCommand.cs" />
+    <Compile Include="Generates\SQLCommands\SchemaSQLCommand.cs" />
+    <Compile Include="Generates\SQLCommands\FileGroupSQLCommand.cs" />
+    <Compile Include="Generates\SQLCommands\StoreProcedureSQLCommand.cs" />
+    <Compile Include="Generates\SQLCommands\FullTextSQLCommand.cs" />
+    <Compile Include="Generates\SQLCommands\TextObjectSQLCommand.cs" />
+    <Compile Include="Generates\SQLCommands\UserSQLCommand.cs" />
+    <Compile Include="Generates\SQLCommands\ViewSQLCommand.cs" />
+    <Compile Include="Generates\SQLCommands\TriggerSQLCommand.cs" />
     <Compile Include="Generates\Util\Constants.cs" />
     <Compile Include="Generates\GenerateDefaults.cs" />
     <Compile Include="Generates\GenerateExtendedProperties.cs" />
@@ -228,20 +240,11 @@
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DBDiff.Front\DBDiff.Front.csproj">
-      <Project>{E82CFC94-DE8C-4EDD-AA0C-F78ABAE03768}</Project>
-      <Name>DBDiff.Front</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DBDiff.Schema\DBDiff.Schema.csproj">
-      <Project>{406558A0-1B98-4D0E-B8B6-2013700B065A}</Project>
-      <Name>DBDiff.Schema</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="DBDiff.Schema.SQLServer.snk" />
+    <None Include="Migrated rules for DBDiff.Schema.SQLServer.ruleset" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -253,8 +256,8 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Front\SqlOptionsFront.resx">
-      <SubType>Designer</SubType>
       <DependentUpon>SqlOptionsFront.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Front\SqlServerConnectFront.resx">
       <DependentUpon>SqlServerConnectFront.cs</DependentUpon>
@@ -267,6 +270,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>Клиентский профиль .NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
@@ -282,6 +290,11 @@
       <ProductName>.NET Framework 3.5</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Test.ico" />
@@ -289,6 +302,16 @@
   <ItemGroup>
     <None Include="DiagramaClases.cd" />
     <None Include="Resources\Database.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DBDiff.Front\DBDiff.Front.csproj">
+      <Project>{E82CFC94-DE8C-4EDD-AA0C-F78ABAE03768}</Project>
+      <Name>DBDiff.Front</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DBDiff.Schema\DBDiff.Schema.csproj">
+      <Project>{406558A0-1B98-4D0E-B8B6-2013700B065A}</Project>
+      <Name>DBDiff.Schema</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

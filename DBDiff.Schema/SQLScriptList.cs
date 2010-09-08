@@ -1,9 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
+using System;
 
 namespace DBDiff.Schema
 {
+    
     public class SQLScriptList
     {
         private List<SQLScript> list;

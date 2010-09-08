@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using DBDiff.Schema.SQLServer.Generates.Model;
 using DBDiff.Schema.Misc;
+using DBDiff.Schema.SQLServer.Generates.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Compare
 {
@@ -14,6 +11,8 @@ namespace DBDiff.Schema.SQLServer.Generates.Compare
             try
             {
                 Database data = Origen;
+                data.CompareDataBaseVersion = Destino.Info.Version;
+                (new CompareDefaults()).GenerateDiferences<Database>(Origen.Defaults, Destino.Defaults);
                 (new CompareTables()).GenerateDiferences<Database>(Origen.Tables, Destino.Tables);
                 (new CompareAssemblies()).GenerateDiferences<Database>(Origen.Assemblies, Destino.Assemblies);
                 (new CompareUserDataTypes()).GenerateDiferences<Database>(Origen.UserTypes, Destino.UserTypes);

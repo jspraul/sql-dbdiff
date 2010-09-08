@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
+using DBDiff.Schema.Attributes;
 using DBDiff.Schema.Model;
 using DBDiff.Schema.SQLServer.Generates.Model.Util;
-using DBDiff.Schema.Attributes;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class View : Code 
     {
         private SchemaList<Index, View> indexes;

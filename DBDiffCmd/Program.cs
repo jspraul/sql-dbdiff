@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Data.SqlClient;
+using System.IO;
 using DBDiff.Schema.SQLServer.Generates.Generates;
 using DBDiff.Schema.SQLServer.Generates.Options;
-using System.IO;
-using System.Data.SqlClient;
 
 namespace DBDiff.OCDB
 {
@@ -55,9 +52,14 @@ namespace DBDiff.OCDB
                 if (TestConnection(arguments.ConnectionString1, arguments.ConnectionString2))
                 {
                     Generate sql = new Generate();
+                    SqlOption opt = new SqlOption(true);
+                    opt.Ignore.FilterSchema = false;
+                    opt.Ignore.FilterUsers = false;
+                    opt.Ignore.FilterTableFileGroup = false;
+                    sql.Options = opt;
                     sql.ConnectionString = arguments.ConnectionString1;
                     System.Console.WriteLine("Reading first database...");
-                    sql.Options = SqlFilter;
+                    //sql.Options = SqlFilter;
                     origen = sql.Process();                    
 
                     sql.ConnectionString = arguments.ConnectionString2;

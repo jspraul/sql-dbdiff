@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using System.Globalization;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class Parameter
     {
         private string type;

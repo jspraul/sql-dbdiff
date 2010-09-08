@@ -1,10 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+
+    
     public class ConstraintColumns:SchemaList<ConstraintColumn, Constraint>
     {
         public ConstraintColumns(Constraint parent)

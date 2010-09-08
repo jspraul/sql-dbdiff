@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using DBDiff.Schema.Model;
+using System;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public abstract class SQLServerSchemaBase:SchemaBase, ISQLServerSchemaBase
     {
         private SchemaList<ExtendedProperty,ISchemaBase> extendedProperties;

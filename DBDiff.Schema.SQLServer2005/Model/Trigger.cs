@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class Trigger : Code
     {        
         private Boolean isDisabled;
@@ -76,8 +75,10 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
 
         public string ToSQLEnabledDisabled()
         {
+            bool sql2000 = ((Database)Parent.Parent).Info.Version == DatabaseInfo.VersionNumber.SQLServer2000;
             if (!IsDDLTrigger)
             {
+                if (sql2000) return "";
                 if (IsDisabled)
                     return "DISABLE TRIGGER [" + Name + "] ON " + Parent.FullName + "\r\nGO\r\n";
                 else
@@ -86,9 +87,9 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
             else
             {
                 if (IsDisabled)
-                    return "DISABLE TRIGGER [" + Name + "]\r\nGO\r\n";
+                    return sql2000 ? "ALTER TABLE " + Parent.FullName + " DISABLE TRIGGER [" + Name + "]\r\nGO\r\n" : "DISABLE TRIGGER [" + Name + "]\r\nGO\r\n";
                 else
-                    return "ENABLE TRIGGER [" + Name + "]\r\nGO\r\n";
+                    return sql2000 ? "ALTER TABLE " + Parent.FullName + " ENABLE TRIGGER [" + Name + "]\r\nGO\r\n" :"ENABLE TRIGGER [" + Name + "]\r\nGO\r\n";
             }
         }
 

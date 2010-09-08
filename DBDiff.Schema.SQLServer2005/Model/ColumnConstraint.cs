@@ -1,13 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
     /// <summary>
     /// Clase de constraints de Columnas (Default Constraint y Check Constraint)
     /// </summary>
+    /// 
+    
     public class ColumnConstraint : SQLServerSchemaBase
     {
         private Constraint.ConstraintType type;

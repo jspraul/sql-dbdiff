@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DBDiff.Schema
 {
+    
     public class SQLScript : IComparable<SQLScript>
     {
         private string sql;

@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using System.Text;
 using System.Data.SqlClient;
-using DBDiff.Schema.Events;
-using DBDiff.Schema.SQLServer.Generates.Options;
 using DBDiff.Schema.SQLServer.Generates.Model;
+using DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands;
 
 namespace DBDiff.Schema.SQLServer.Generates.Generates
 {
@@ -18,22 +13,13 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
             this.root = root;
         }
 
-        private static string GetSQL()
-        {
-            string sql = "select obj.object_id, Name, SCHEMA_NAME(obj.schema_id) AS Owner, ISNULL(smobj.definition, ssmobj.definition) AS [Definition] from sys.objects obj  ";
-            sql += "LEFT OUTER JOIN sys.sql_modules AS smobj ON smobj.object_id = obj.object_id ";
-            sql += "LEFT OUTER JOIN sys.system_sql_modules AS ssmobj ON ssmobj.object_id = obj.object_id ";
-            sql += "where obj.type='R'";
-            return sql;
-        }
-
         public void Fill(Database database, string connectionString)
         {
             if (database.Options.Ignore.FilterRules)
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    using (SqlCommand command = new SqlCommand(GetSQL(), conn))
+                    using (SqlCommand command = new SqlCommand(RuleSQLCommand.Get(database.Info.Version), conn))
                     {
                         conn.Open();
                         using (SqlDataReader reader = command.ExecuteReader())

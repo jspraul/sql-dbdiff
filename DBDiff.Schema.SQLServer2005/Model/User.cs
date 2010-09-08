@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class User : SQLServerSchemaBase
     {
         private string login;
@@ -29,19 +28,28 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
         public override string ToSql()
         {
             string sql = "";
-            sql += "CREATE USER ";
-            sql += FullName + " ";
-            if (!String.IsNullOrEmpty(login))
-                sql += "FOR LOGIN [" + login + "] ";
+            if (((Database)Parent).Info.Version != DatabaseInfo.VersionNumber.SQLServer2000)
+            {
+                sql += "CREATE USER ";
+                sql += FullName + " ";
+                if (!String.IsNullOrEmpty(login))
+                    sql += "FOR LOGIN [" + login + "] ";
+                else
+                    sql += "WITHOUT LOGIN ";
+                if (!String.IsNullOrEmpty(Owner))
+                    sql += "WITH DEFAULT_SCHEMA=[" + Owner + "]";
+            }
             else
-                sql += "WITHOUT LOGIN ";
-            if (!String.IsNullOrEmpty(Owner))
-                sql += "WITH DEFAULT_SCHEMA=[" + Owner + "]";
+            {
+                sql += "IF  EXISTS (SELECT name FROM master..sysxlogins WHERE name='" + login + "') EXEC sp_grantdbaccess @loginame = '" + login + "', @name_in_db = '" + Name + "'";
+            }
             return sql.Trim() + "\r\nGO\r\n";
         }
 
         public override string ToSqlDrop()
         {
+            if (((Database)Parent).Info.Version == DatabaseInfo.VersionNumber.SQLServer2000) return "EXEC sp_revokedbaccess '" + Name + "'\r\nGO\r\n";
+            else
             return "DROP USER " + FullName + "\r\nGO\r\n";
         }
 

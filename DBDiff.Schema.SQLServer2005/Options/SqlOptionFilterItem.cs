@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿
 
+using System;
 namespace DBDiff.Schema.SQLServer.Generates.Options
 {
+    
     public class SqlOptionFilterItem
     {
         private Enums.ObjectType type;

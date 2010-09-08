@@ -5,6 +5,7 @@ using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class CLRFunction : CLRCode
     {
         private List<Parameter> parameters;

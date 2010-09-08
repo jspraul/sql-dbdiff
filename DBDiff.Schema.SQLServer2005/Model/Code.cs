@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using System.Text.RegularExpressions;
 using DBDiff.Schema.Model;
 using DBDiff.Schema.SQLServer.Generates.Model.Util;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public abstract class Code: SQLServerSchemaBase, ICode
     {
         private string text;
@@ -18,7 +18,9 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
         protected string typeName = "";
         private int deepMax = 0;
         private int deepMin = 0;
+        
         private Enums.ScripActionType addAction;
+        
         private Enums.ScripActionType dropAction;
 
         public Code(ISchemaBase parent, Enums.ObjectType type, Enums.ScripActionType addAction, Enums.ScripActionType dropAction)

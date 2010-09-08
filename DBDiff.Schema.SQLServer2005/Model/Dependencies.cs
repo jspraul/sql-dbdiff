@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Linq;
+
 using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     internal class Dependencies: List<Dependence>
     {
         private Database database;
@@ -136,14 +136,21 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
             List<string> cons = new List<string>();
             List<ISchemaBase> real = new List<ISchemaBase>();
 
-            cons = (from depends in this
+            /*cons = (from depends in this
                     where (depends.Type == Enums.ObjectType.Constraint || depends.Type == Enums.ObjectType.Index) &&
                     ((depends.DataTypeId == dataTypeId || dataTypeId == 0) && (depends.SubObjectId == columnId || columnId == 0) && (depends.ObjectId == tableId))
                     select depends.FullName)
                         .Concat(from depends in this
                                 where (depends.Type == Enums.ObjectType.View || depends.Type == Enums.ObjectType.Function) &&
                                 (depends.ObjectId == tableId)
-                                select depends.FullName).ToList();
+                                select depends.FullName).ToList();*/
+            foreach (Dependence depends in this)
+            {
+                if ((depends.Type == Enums.ObjectType.Constraint || depends.Type == Enums.ObjectType.Index) && ((depends.DataTypeId == dataTypeId || dataTypeId == 0) && (depends.SubObjectId == columnId || columnId == 0) && (depends.ObjectId == tableId)))
+                    cons.Add(depends.FullName);
+                if ((depends.Type == Enums.ObjectType.View || depends.Type == Enums.ObjectType.Function) && (depends.ObjectId == tableId))
+                    cons.Add(depends.FullName);
+            }
 
             cons.ForEach(item => 
                 { 

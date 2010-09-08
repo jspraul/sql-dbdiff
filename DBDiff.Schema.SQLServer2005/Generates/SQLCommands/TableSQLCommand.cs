@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using DBDiff.Schema.SQLServer.Generates.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands
@@ -12,6 +9,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands
         {
             if (version == DatabaseInfo.VersionNumber.SQLServer2000) return GetTableCount2000();
             if (version == DatabaseInfo.VersionNumber.SQLServer2005) return GetTableCount2005();
+            if (version == DatabaseInfo.VersionNumber.SQLServer2008) return GetTableCount2008();
             return "";
         }
 
@@ -21,6 +19,10 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands
         }
 
         private static string GetTableCount2005()
+        {
+            return "SELECT Count(*) from sys.tables";
+        }
+        private static string GetTableCount2008()
         {
             return "SELECT Count(*) from sys.tables";
         }
@@ -90,21 +92,23 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands
         private static string GetTableDetail2000()
         {
             string sql = "";
-            sql += "SELECT SO.name, ";
-            sql += "SO.id as object_id, ";
-            sql += "SU.name as Owner, ";
-            sql += "OBJECTPROPERTY(SO.ID,'TableTextInRowLimit') AS Text_In_Row_limit,";
-            sql += "0 AS HasVarDecimal, ";
-            sql += "CONVERT(bit,0) AS large_value_types_out_of_row, ";
-            sql += "F.groupname AS FileGroup, ";
-            sql += "ISNULL(F2.groupname,'') AS FileGroupText, ";
-            sql += "OBJECTPROPERTY(SO.ID,'TableHasClustIndex') AS HasClusteredIndex ";
-            sql += "FROM sysobjects SO ";
-            sql += "inner join sysindexes I ON I.id = SO.id and I.indid < 2 ";
-            sql += "inner join sysfilegroups f on f.groupid = i.groupid ";
-            sql += "left join sysindexes I2 ON I2.id = SO.id and I2.indid = 255 ";
-            sql += "left join sysfilegroups f2 on f2.groupid = i2.groupid ";
-            sql += "INNER JOIN sysusers SU ON SU.uid = SO.uid WHERE type = 'U' ORDER BY SO.name";
+            sql += "SELECT DISTINCT T.type AS ObjectType, C.Name, S4.Name as OwnerType, ";
+            sql += "convert(int,C.xusertype) as user_type_id, convert(int,C.ColId) AS ID, C.length AS Size, C.xprec as [Precision],C.xscale as Scale, ISNULL(C.Collation,'') as Collation, convert(bit,C.Isnullable) AS IsNullable,convert(bit,ColumnProperty(C.id, C.name, 'IsRowGuidCol')) AS IsRowGuid, convert(bit,C.iscomputed) AS IsComputed,convert(bit,( case C.colstat when 1 then 1 else 0 end)) AS IsIdentity, COLUMNPROPERTY(T.id,C.name,'IsIdNotForRepl') AS IsIdentityRepl,IDENT_SEED('[' + S1.name + '].[' + T.Name + ']') AS IdentSeed, IDENT_INCR('[' + S1.name + '].[' + T.Name + ']') AS IdentIncrement, ISNULL(scom.Text,'') AS Formula, convert(bit,0) AS FormulaPersisted,convert(int, CASE WHEN ISNULL(DEP.depnumber,0) = 0 THEN 0 ELSE 1 END) AS HasComputedFormula, convert(int,CASE WHEN ISNULL(IC.colid,0) = 0 THEN 0 ELSE 1 END) AS HasIndex, TY.Name AS Type, '' AS XMLSchema, convert(bit,0) as Is_xml_document, convert(bit,(case when TY.xusertype>256 then 1 else 0 end)) as is_user_defined, ";
+            sql += "T.Name AS TableName, convert(int,T.id) AS TableId,S1.name AS TableOwner,OBJECTPROPERTY(T.id, 'TableTextInRowLimit') as Text_In_Row_limit,convert(bit,0) as large_value_types_out_of_row,ISNULL(objectproperty(T.id, N'TableHasVarDecimalStorageFormat'),0) AS HasVarDecimal,OBJECTPROPERTY(T.ID,'TableHasClustIndex') AS HasClusteredIndex,DSIDX.groupname AS FileGroup,ISNULL(FGLOB.groupname,'') AS FileGroupText, ";
+            sql += "ISNULL(convert(int,DC.id),0) AS DefaultId, ODC.name AS DefaultName, sccom.Text AS DefaultDefinition, convert(int,C.domain) as rule_object_id, convert(int,C.cdefault) as default_object_id ";
+            sql += "FROM syscolumns C ";
+            sql += "INNER JOIN sysobjects T ON T.id = C.id and T.type='U' ";
+            sql += "INNER JOIN systypes TY ON TY.xusertype = C.xusertype ";
+            sql += "INNER JOIN sysusers S1 ON S1.uid = T.uid ";
+            sql += "INNER JOIN sysindexes IDX ON IDX.id = T.id and IDX.indid < 2 ";
+            sql += "INNER JOIN sysfilegroups AS DSIDX ON DSIDX.groupid = IDX.groupid ";
+            sql += "LEFT JOIN sysusers S4 ON S4.uid = TY.uid ";
+            sql += "LEFT JOIN (syscolumns CC inner join syscomments scom on (CC.id=scom.id))  ON CC.iscomputed=1 and CC.colid = C.colId AND C.id = CC.id ";
+            sql += "LEFT JOIN sysdepends DEP ON DEP.depid = C.id AND DEP.depnumber = C.colId AND DEP.id = C.id ";
+            sql += "LEFT JOIN sysindexkeys IC ON IC.id = T.id AND IC.colId = C.colId ";
+            sql += "LEFT JOIN (sysfilegroups FGLOB inner join sysindexes ILOB  on ILOB.groupid=FGLOB.groupid and ILOB.indid=255)  ON ILOB.id = T.id ";
+            sql += "LEFT JOIN (sysconstraints DC inner join sysobjects  ODC on ODC.id=DC.constid and ODC.xtype ='D ' inner join syscomments sccom on (ODC.id=sccom.id)) ON DC.id = T.id AND DC.colid = C.ColId  ";
+            sql += "ORDER BY T.Name,convert(int,T.id),convert(int,C.ColId)";
             return sql;
         }
         #endregion

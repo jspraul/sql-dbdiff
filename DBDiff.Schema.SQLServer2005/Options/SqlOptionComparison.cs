@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
+using System;
 namespace DBDiff.Schema.SQLServer.Generates.Options
 {
+    
     public class SqlOptionComparison
     {
         public enum CaseSensityOptions
@@ -13,9 +11,11 @@ namespace DBDiff.Schema.SQLServer.Generates.Options
             CaseInsensity = 1,
             CaseSensity = 2
         }
-
+        
         private CaseSensityOptions caseSensityType;
+        
         private CaseSensityOptions caseSensityInCode = CaseSensityOptions.CaseInsensity;
+        
         private bool ignoreWhiteSpacesInCode = false;
 
         public bool IgnoreWhiteSpacesInCode

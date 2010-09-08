@@ -1,15 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Linq;
+
 using DBDiff.Schema.Attributes;
 using DBDiff.Schema.Model;
 using DBDiff.Schema.SQLServer.Generates.Options;
+using System.IO;
+
+
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class Database : SQLServerSchemaBase, IDatabase
-    {
+    {        
         private readonly List<DatabaseChangeStatus> _changesOptions;
         private DatabaseInfo _info;
 
@@ -41,6 +45,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
             Defaults = new SchemaList<Default, Database>(this, AllObjects);
             ActionMessage = new SqlAction(this);
         }
+        public DBDiff.Schema.SQLServer.Generates.Model.DatabaseInfo.VersionNumber CompareDataBaseVersion { get; set; }
 
         internal SearchSchemaBase AllObjects { get; private set; }
 
@@ -106,7 +111,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
 
         [ShowItem("User Types", "UDT")]
         public SchemaList<UserDataType, Database> UserTypes { get; private set; }
-
+       
         public SqlOption Options { get; set; }
 
         public DatabaseInfo Info
@@ -119,7 +124,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
         /// Coleccion de dependencias de constraints.
         /// </summary>
         internal Dependencies Dependencies { get; set; }
-
+       // 
         private List<DatabaseChangeStatus> ChangesOptions
         {
             get { return _changesOptions; }
@@ -132,26 +137,31 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
             //Get a list of all of the objects that are SchemaLists, so that we can clone them all.
             var item = new Database() { AllObjects = this.AllObjects };
 
-            var explicitProperties = (from properties in this.GetType().GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)
+            /*var explicitProperties = (from properties in this.GetType().GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)
                                      where properties.PropertyType.GetInterface(typeof(DBDiff.Schema.Model.ISchemaList<Code, Database>).Name) != null
-                                     select properties).ToList();
+                                     select properties).ToList();*/
+            List<PropertyInfo> explicitProperties=new List<PropertyInfo>();
+            foreach (PropertyInfo p in this.GetType().GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public))
+            {
+                if (p.PropertyType.GetInterface(typeof(DBDiff.Schema.Model.ISchemaList<Code, Database>).Name) != null) explicitProperties.Add(p);
 
+            }
             foreach (PropertyInfo property in explicitProperties)
             {
                 object value = property.GetValue(this, null);
 
                 //Clone the value
                 value = value.GetType().GetMethod("Clone").Invoke(value, new object[] { this });
-                                
+
                 //Set the value to the cloned object
                 property.SetValue(item, value, null);
             }
 
             return item;
         }
-
+        //
         public SqlAction ActionMessage { get; private set; }
-
+        //
         public Boolean IsCaseSensity
         {
             get
@@ -204,6 +214,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
             var listDiff = new SQLScriptList();
             listDiff.Add("USE [" + Name + "]\r\nGO\r\n\r\n", 0, Enums.ScripActionType.UseDatabase);
             listDiff.AddRange(Assemblies.ToSqlDiff());
+            listDiff.AddRange(Defaults.ToSqlDiff());
             listDiff.AddRange(UserTypes.ToSqlDiff());
             listDiff.AddRange(TablesTypes.ToSqlDiff());
             listDiff.AddRange(Tables.ToSqlDiff());
@@ -383,7 +394,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
         }
 
         #region Nested type: DatabaseChangeStatus
-
+       // 
         private enum DatabaseChangeStatus
         {
             AlterChangeTracking = 1,

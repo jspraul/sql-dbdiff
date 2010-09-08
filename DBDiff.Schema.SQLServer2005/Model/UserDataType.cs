@@ -6,6 +6,7 @@ using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class UserDataType : SQLServerSchemaBase
     {
         public UserDataType(ISchemaBase parent)
@@ -107,24 +108,46 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
 
         public override string ToSql()
         {
-            string sql = "CREATE TYPE " + FullName;
-            if (!IsAssembly)
+            string sql ="";
+            if (((Database)Parent).Info.Version != DatabaseInfo.VersionNumber.SQLServer2000)
             {
-                sql += " FROM [" + Type + "]";
-                if (Type.Equals("binary") || Type.Equals("varbinary") || Type.Equals("varchar") || Type.Equals("char") ||
-                    Type.Equals("nchar") || Type.Equals("nvarchar"))
-                    sql += "(" + Size.ToString(CultureInfo.InvariantCulture) + ")";
-                if (Type.Equals("numeric") || Type.Equals("decimal"))
-                    sql += " (" + Precision.ToString(CultureInfo.InvariantCulture) + "," +
-                           Scale.ToString(CultureInfo.InvariantCulture) + ")";
-                if (AllowNull)
-                    sql += " NULL";
+                sql = "CREATE TYPE " + FullName;
+                if (!IsAssembly)
+                {
+                    sql += " FROM [" + Type + "]";
+                    if (Type.Equals("binary") || Type.Equals("varbinary") || Type.Equals("varchar") || Type.Equals("char") ||
+                        Type.Equals("nchar") || Type.Equals("nvarchar"))
+                        sql += "(" + Size.ToString(CultureInfo.InvariantCulture) + ")";
+                    if (Type.Equals("numeric") || Type.Equals("decimal"))
+                        sql += " (" + Precision.ToString(CultureInfo.InvariantCulture) + "," +
+                               Scale.ToString(CultureInfo.InvariantCulture) + ")";
+                    if (AllowNull)
+                        sql += " NULL";
+                    else
+                        sql += " NOT NULL";
+                }
                 else
-                    sql += " NOT NULL";
+                {
+                    sql += " EXTERNAL NAME [" + AssemblyName + "].[" + AssemblyClass + "]";
+                }
             }
             else
             {
-                sql += " EXTERNAL NAME [" + AssemblyName + "].[" + AssemblyClass + "]";
+                if (!IsAssembly)
+                {
+                    sql = "EXEC sp_addtype '" + Name + "', '" + Type;
+                    if (Type.Equals("binary") || Type.Equals("varbinary") || Type.Equals("varchar") || Type.Equals("char") ||
+                        Type.Equals("nchar") || Type.Equals("nvarchar"))
+                        sql += "(" + Size.ToString(CultureInfo.InvariantCulture) + ")";
+                    if (Type.Equals("numeric") || Type.Equals("decimal"))
+                        sql += " (" + Precision.ToString(CultureInfo.InvariantCulture) + "," +
+                               Scale.ToString(CultureInfo.InvariantCulture) + ")";
+                    sql += "'";
+                    if (AllowNull)
+                        sql += ", 'NULL'";
+                    else
+                        sql += ", 'NOT NULL'";
+                }
             }
             sql += "\r\nGO\r\n";
             return sql + ToSQLAddBinds();
@@ -132,7 +155,11 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
 
         public override string ToSqlDrop()
         {
-            return "DROP TYPE " + FullName + "\r\nGO\r\n";
+            if (((Database)Parent).Info.Version != DatabaseInfo.VersionNumber.SQLServer2000)
+            {
+                return "DROP TYPE " + FullName + "\r\nGO\r\n";
+            }
+            else return "EXEC sp_droptype '" + Name + "'";
         }
 
         public override string ToSqlAdd()

@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Linq;
+
 using System.Globalization;
 using System.Xml.Serialization;
 using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class Column : SQLServerSchemaBase, IComparable<Column>
     {
         private string collation;
@@ -542,7 +542,16 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
             if (!IsComputed)
             {
                 if (this.IsUserDefinedType)
-                    sql += Type;
+                {
+                    if (((Database)Parent.Parent).Info.Version == DatabaseInfo.VersionNumber.SQLServer2000)
+                    {
+                    int starttrim=Type.LastIndexOf('[');
+                    int endtrim=Type.Length-starttrim;
+                        sql +=Type.Substring(starttrim, endtrim);
+                    }
+                    else
+                    sql += Type; 
+                }
                 else
                     sql += "[" + Type + "]";
                 if (Type.Equals("binary") || Type.Equals("varbinary") || Type.Equals("varchar") || Type.Equals("char") || Type.Equals("nchar") || Type.Equals("nvarchar"))
@@ -746,7 +755,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
                 if (origen.IsNullable != destino.IsNullable) return false;
                 if (origen.IsFileStream != destino.IsFileStream) return false;
                 if (origen.IsSparse != destino.IsSparse) return false;
-                if (!origen.Collation.Equals(destino.Collation)) return false;                
+                if (!origen.Collation.Equals(destino.Collation) && !origen.IsUserDefinedType) return false;                
                 if (!origen.Type.Equals(destino.type, StringComparison.CurrentCultureIgnoreCase)) return false;
                 //Si el tipo de campo es custom, no compara size del campo.
                 if (!origen.IsUserDefinedType)

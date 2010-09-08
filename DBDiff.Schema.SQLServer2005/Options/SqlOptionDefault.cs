@@ -1,21 +1,31 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DBDiff.Schema.SQLServer.Generates.Options
 {
+    
     public class SqlOptionDefault
     {
+        
         private string defaultIntegerValue = "0";
+        
         private string defaultRealValue = "0.0";
+        
         private string defaultTextValue = "''";
+        
         private string defaultDateValue = "getdate()";
+        
         private string defaultVariantValue = "''";
+        
         private string defaultNTextValue = "N''";
+        
         private string defaultBlobValue = "0x";
+        
         private string defaultUniqueValue = "NEWID()";
+        
         private Boolean useDefaultValueIfExists = true;
+        
         private string defaultTime = "00:00:00";
+        
         private string defaultXml = "";
 
         public string DefaultXml

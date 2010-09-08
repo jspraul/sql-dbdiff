@@ -1,10 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class Index : SQLServerSchemaBase
     {
         public enum IndexTypeEnum
@@ -143,6 +143,9 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
         public override string ToSql()
         {
             StringBuilder sql = new StringBuilder();
+            //bool sql2000 = ((Database)Parent.Parent).CompareDataBaseVersion == DatabaseInfo.VersionNumber.SQLServer2000;
+            bool sql2000 = ((Database)Parent.Parent).Info.Version == DatabaseInfo.VersionNumber.SQLServer2000;
+            bool addtext = false;
             string includes = "";
             if ((Type == IndexTypeEnum.Clustered) && (IsUniqueKey)) sql.Append("CREATE UNIQUE CLUSTERED ");
             if ((Type == IndexTypeEnum.Clustered) && (!IsUniqueKey)) sql.Append("CREATE CLUSTERED ");
@@ -164,8 +167,9 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
                     if (j < Columns.Count - 1) sql.Append(",");
                     sql.Append("\r\n");
                 }
-                else
+                else if (!sql2000) 
                 {
+                    
                     if (String.IsNullOrEmpty(includes)) includes = ") INCLUDE (";
                     includes += "[" + Columns[j].Name + "],";
                 }
@@ -173,27 +177,105 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
             if (!String.IsNullOrEmpty(includes)) includes = includes.Substring(0, includes.Length - 1);
             sql.Append(includes);
             sql.Append(")");
-            if (!String.IsNullOrEmpty(FilterDefintion)) sql.Append("\r\n WHERE " + FilterDefintion + "\r\n");
-            sql.Append(" WITH (");
-            if (Parent.ObjectType == Enums.ObjectType.TableType)
+            if (!String.IsNullOrEmpty(FilterDefintion) && !sql2000) sql.Append("\r\n WHERE " + FilterDefintion + "\r\n");
+            if (sql2000)
             {
-                if ((IgnoreDupKey) && (IsUniqueKey)) sql.Append("IGNORE_DUP_KEY = ON "); else sql.Append("IGNORE_DUP_KEY  = OFF ");
+                if (Parent.ObjectType == Enums.ObjectType.TableType)
+                {
+                    if ((IgnoreDupKey) && (IsUniqueKey))
+                    {
+                        sql.Append(" WITH ");
+                        sql.Append("IGNORE_DUP_KEY");
+                    }
+                }
+                else
+                {
+                    if (IsPadded)
+                    {
+                        sql.Append(" WITH ");
+                        sql.Append("PAD_INDEX");
+                        addtext = true;
+                    }
+                    if (IsAutoStatistics)
+                    {
+                        if (addtext)
+                        {
+                            sql.Append(",");
+                        }
+                        else { sql.Append(" WITH "); }
+                        sql.Append("STATISTICS_NORECOMPUTE");
+                        addtext = true;
+                    }
+
+                    if (Type != IndexTypeEnum.XML)
+                        if ((IgnoreDupKey) && (IsUniqueKey))
+                        {
+                            if (addtext)
+                            {
+                                sql.Append(",");
+                            }
+                            else { sql.Append(" WITH "); }
+                            sql.Append("IGNORE_DUP_KEY");
+                            addtext = true;
+                        }
+
+
+                    if (FillFactor != 0)
+                    {
+                        if (addtext)
+                        {
+                            sql.Append(",");
+                        }
+                        else { sql.Append(" WITH "); }
+                        sql.Append(" FILLFACTOR = " + FillFactor.ToString());
+                        addtext = true;
+                    }
+                }
             }
             else
             {
-                if (IsPadded) sql.Append("PAD_INDEX = ON, "); else sql.Append("PAD_INDEX  = OFF, ");
-                if (IsAutoStatistics) sql.Append("STATISTICS_NORECOMPUTE = ON, "); else sql.Append("STATISTICS_NORECOMPUTE  = OFF, ");
-                if (Type != IndexTypeEnum.XML)
-                    if ((IgnoreDupKey) && (IsUniqueKey)) sql.Append("IGNORE_DUP_KEY = ON, "); else sql.Append("IGNORE_DUP_KEY  = OFF, ");
-                if (AllowRowLocks) sql.Append("ALLOW_ROW_LOCKS = ON, "); else sql.Append("ALLOW_ROW_LOCKS  = OFF, ");
-                if (AllowPageLocks) sql.Append("ALLOW_PAGE_LOCKS = ON"); else sql.Append("ALLOW_PAGE_LOCKS  = OFF");
-                if (FillFactor != 0) sql.Append(", FILLFACTOR = " + FillFactor.ToString());
+                sql.Append(" WITH (");
+                if (Parent.ObjectType == Enums.ObjectType.TableType)
+                {
+                    if ((IgnoreDupKey) && (IsUniqueKey))
+                    {
+                        sql.Append("IGNORE_DUP_KEY = ON ");
+                    }
+                    else sql.Append("IGNORE_DUP_KEY  = OFF ");
+                }
+                else
+                {
+                    if (IsPadded)
+                        sql.Append("PAD_INDEX = ON, ");
+                    else sql.Append("PAD_INDEX  = OFF, ");
+                    if (IsAutoStatistics)
+                        sql.Append("STATISTICS_NORECOMPUTE = ON, ");
+                    else sql.Append("STATISTICS_NORECOMPUTE  = OFF,");
+                    if (Type != IndexTypeEnum.XML)
+                        if ((IgnoreDupKey) && (IsUniqueKey))
+                        {
+                            sql.Append("IGNORE_DUP_KEY = ON, ");
+                        }
+                        else sql.Append("IGNORE_DUP_KEY  = OFF, ");
+                    if (AllowRowLocks)
+                        sql.Append("ALLOW_ROW_LOCKS = ON, ");
+                    else sql.Append("ALLOW_ROW_LOCKS  = OFF, ");
+
+                    if (AllowPageLocks)
+                        sql.Append("ALLOW_PAGE_LOCKS = ON");
+                    else sql.Append("ALLOW_PAGE_LOCKS  = OFF");
+
+                    if (FillFactor != 0)
+                        sql.Append(", FILLFACTOR = " + FillFactor.ToString());
+                }
+                sql.Append(")");
             }
-            sql.Append(")");
             if (!String.IsNullOrEmpty(FileGroup)) sql.Append(" ON [" + FileGroup + "]");
             sql.Append("\r\nGO\r\n");
             if (IsDisabled)
-                sql.Append("ALTER INDEX [" + Name + "] ON " + ((Table)Parent).FullName + " DISABLE\r\nGO\r\n");
+                if(sql2000)
+                    sql.Append("DROP INDEX "+((Table)Parent).FullName+".[" + Name + "]\r\nGO\r\n");
+                else sql.Append("ALTER INDEX [" + Name + "] ON " + ((Table)Parent).FullName + " DISABLE\r\nGO\r\n");
 
             sql.Append(ExtendedProperties.ToSql());
             return sql.ToString();
@@ -211,9 +293,14 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
 
         private string ToSqlDrop(string FileGroupName)
         {
-            string sql = "DROP INDEX [" + Name + "] ON " + Parent.FullName;
-            if (!String.IsNullOrEmpty(FileGroupName)) sql += " WITH (MOVE TO [" + FileGroupName + "])";
-            sql += "\r\nGO\r\n";
+            string sql = "";
+            if (((Database)Parent.Parent).Info.Version == DatabaseInfo.VersionNumber.SQLServer2000) sql = "DROP INDEX " + ((Table)Parent).FullName + ".[" + Name + "]\r\nGO\r\n";
+            else
+            {
+                sql = "DROP INDEX [" + Name + "] ON " + Parent.FullName;
+                if (!String.IsNullOrEmpty(FileGroupName)) sql += " WITH (MOVE TO [" + FileGroupName + "])";
+                sql += "\r\nGO\r\n";
+            }
             return sql;
         }
 
@@ -241,6 +328,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
 
         private string ToSqlEnabled()
         {
+            if (((Database)Parent.Parent).Info.Version == DatabaseInfo.VersionNumber.SQLServer2000) return "";
             if (IsDisabled)
                 return "ALTER INDEX [" + Name + "] ON " + Parent.FullName + " DISABLE\r\nGO\r\n";
             return "ALTER INDEX [" + Name + "] ON " + Parent.FullName + " REBUILD\r\nGO\r\n";

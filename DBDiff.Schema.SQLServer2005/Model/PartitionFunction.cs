@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Globalization;
+using System.Text;
 using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class PartitionFunction:SQLServerSchemaBase
     {
         private const int IS_STRING = 0;
@@ -159,7 +159,13 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
             string sql = "ALTER PARTITION FUNCTION [" + Name + "]()\r\n";
             string sqlmergue = "";
             string sqsplit = "";
-            IEnumerable<string> items = old.Values.Except<string>(this.values);
+            List<string> items = new List<string>();
+            //IEnumerable<string> items = old.Values.Except<string>(this.values);
+            foreach (string s in old.Values)
+            {
+                if (!this.values.Contains(s))
+                    items.Add(s);
+            }
             int valueType = ValueItem(type);
             foreach (var item in items)
             {
@@ -179,9 +185,15 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
                                 sqlmergue += item;
                 sqlFinal.Append(sql + sqlmergue + ")\r\nGO\r\n");
             }
-            IEnumerable<string> items2 = this.Values.Except<string>(this.old.Values);
-            foreach (var item in items2)
+            List<string> items2=new List<string>();
+            //IEnumerable<string> items2 = this.Values.Except<string>(this.old.Values);
+            foreach (string s in this.Values)
             {
+                if (!this.old.Values.Contains(s))
+                    items2.Add(s);                    
+            }
+                foreach (var item in items2)
+                {
                 sqsplit = "SPLIT RANGE (";
                 if (valueType == IS_STRING)
                     sqsplit += "N'" + item + "'";
@@ -243,7 +255,14 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
             if (destino == null) throw new ArgumentNullException("destino");
             if (origen == null) throw new ArgumentNullException("origen");
             if (origen.Values.Count != destino.Values.Count) return false;
-            if (origen.Values.Except(destino.values).ToList().Count != 0) return false;
+            List<string> items = new List<string>();
+            foreach (string s in origen.Values)
+            {
+                if (!destino.values.Contains(s))
+                    items.Add(s);            }
+
+            //if (origen.Values.Except(destino.values).ToList().Count != 0) return false;
+            if (items.Count != 0) return false;
             return true;
         }
     }

@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Data.SqlClient;
 using DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands;
+using System;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class DatabaseInfo
     {
         public enum VersionNumber
@@ -14,7 +13,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
             SQLServer2005 = 9,
             SQLServer2008 = 10
         }
-
+        
         private string _connectionString;
         private Database _database;
 
@@ -40,6 +39,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
                         {
                             this.Collation = reader["Collation"].ToString();
                             this.HasFullTextEnabled = ((int)reader["IsFulltextEnabled"]) == 1;
+                            this.CompatibilityLevel = reader["CompatibilityLevel"].ToString();
                         }
                     }
 
@@ -50,6 +50,8 @@ namespace DBDiff.Schema.SQLServer.Generates.Model
         public VersionNumber Version { get; private set; }
 
         public string Collation { get; private set; }
+
+        public string CompatibilityLevel { get; private set; }
 
         public bool HasFullTextEnabled { get; private set; }
 

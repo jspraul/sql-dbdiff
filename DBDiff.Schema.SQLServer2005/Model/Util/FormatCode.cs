@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using System.Text.RegularExpressions;
 using DBDiff.Schema.Model;
 
@@ -57,7 +55,9 @@ namespace DBDiff.Schema.SQLServer.Generates.Model.Util
         {
             SearchItem sitem = new SearchItem();
             Regex regex = new Regex(@"((/\*)(\w|\s|\d|\[|\]|\.)*(\*/))|((\-\-)(.)*)", RegexOptions.IgnoreCase);
-            Regex reg2 = new Regex(@"CREATE " + ObjectType + @"(\s|\r|\n|\t|\w|\/|\*|-|@|_|&|#)*((\[)?" + item.Owner + @"(\])?((\s)*)?\.)?((\s)*)?(\[)?" + item.Name + @"(\])?", (RegexOptions)((int)RegexOptions.IgnoreCase + (int)RegexOptions.Multiline));
+            Regex reg2 = new Regex(@"CREATE( )+" + ObjectType + @"(\s|\r|\n|\t|\w|\/|\*|-|@|_|&|#)*((\[)?" + item.Owner + @"(\])?((\s)*)?\.)?((\s)*)?(\[)?" + item.Name + @"(\])?", (RegexOptions)((int)RegexOptions.IgnoreCase + (int)RegexOptions.Multiline));
+            //Regex reg2_1 = new Regex(@"CREATE( )+" + ObjectType + @"(\s|\r|\n|\t|\w|\/|\*|-|@|_|&|#)*((\[)?" + item.Name + @"(\])?", (RegexOptions)((int)RegexOptions.IgnoreCase + (int)RegexOptions.Multiline));
+            
             Regex reg3 = new Regex(@"((\[)?" + item.Owner + @"(\])?\.)?((\s)+\.)?(\s)*(\[)?" + item.Name + @"(\])?", RegexOptions.IgnoreCase);
             Regex reg4 = new Regex(@"( )*\[");
 
@@ -72,8 +72,8 @@ namespace DBDiff.Schema.SQLServer.Generates.Model.Util
                 Match match = reg2.Match(prevText, indexBegin);
                 if (match.Success)
                     iAux = match.Index;
-                else
-                    iAux = -1;
+
+                    else iAux = -1;                   
 
                 if ((abiertas.Count == indexStart) || (!match.Success))
                     finish = true;
@@ -118,7 +118,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Model.Util
             try
             {
                 SearchItem sitem = FindCreate(ObjectType, item, prevText);
-                Regex regAlter = new Regex("CREATE");
+                Regex regAlter = new Regex("CREATE", RegexOptions.IgnoreCase);
 
                 if (!quitSchemaBinding)
                     return regAlter.Replace(sitem.Body, "ALTER", 1, sitem.FindPosition);

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 
 namespace DBDiff.Schema.Model
 {
+    
     public class SearchSchemaBase
     {
         private Dictionary<String, Enums.ObjectType> objectTypes;

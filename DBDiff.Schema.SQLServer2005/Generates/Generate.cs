@@ -48,6 +48,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
 
         public SqlOption Options
         {
+            get { return options; }
             set { options = value; }
         }
 
@@ -83,6 +84,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
                     {*/
             (new GenerateRules(this)).Fill(databaseSchema, connectionString);
             (new GenerateTables(this)).Fill(databaseSchema, connectionString, messages);
+            (new GenerateDefaults(this)).Fill(databaseSchema, connectionString);
             (new GenerateViews(this)).Fill(databaseSchema, connectionString, messages);
             (new GenerateIndex(this)).Fill(databaseSchema, connectionString);
             (new GenerateFullTextIndex(this)).Fill(databaseSchema, connectionString);

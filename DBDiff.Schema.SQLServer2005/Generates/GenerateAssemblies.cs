@@ -1,6 +1,6 @@
 using System;
-using System.Text;
 using System.Data.SqlClient;
+using System.Text;
 using DBDiff.Schema.SQLServer.Generates.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Generates
@@ -81,6 +81,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
         public void Fill(Database database, string connectionString)
         {
             int lastViewId = 0;
+            if (database.Info.Version == DatabaseInfo.VersionNumber.SQLServer2000) return;
             if (database.Options.Ignore.FilterAssemblies)
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))

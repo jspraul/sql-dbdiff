@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using DBDiff.Schema.SQLServer.Generates.Model;
+﻿
 using System.Data.SqlClient;
+using DBDiff.Schema.SQLServer.Generates.Model;
+using DBDiff.Schema.SQLServer.Generates.Generates.SQLCommands;
 
 namespace DBDiff.Schema.SQLServer.Generates.Generates
 {
@@ -16,14 +14,14 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
             this.root = root;
         }
 
-        private static string GetSQL()
-        {
-            string sql = "SELECT S.Name as Owner,F.name AS FileGroupName, fulltext_catalog_id, FC.Name, path, FC.is_default, is_accent_sensitivity_on ";
-            sql += "FROM sys.fulltext_catalogs FC ";
-            sql += "LEFT JOIN sys.filegroups F ON F.data_space_id = FC.data_space_id ";
-            sql += "INNER JOIN sys.schemas S ON S.schema_id = FC.principal_id";
-            return sql;
-        }
+        //private static string GetSQL()
+        //{
+        //    string sql = "SELECT S.Name as Owner,F.name AS FileGroupName, fulltext_catalog_id, FC.Name, path, FC.is_default, is_accent_sensitivity_on ";
+        //    sql += "FROM sys.fulltext_catalogs FC ";
+        //    sql += "LEFT JOIN sys.filegroups F ON F.data_space_id = FC.data_space_id ";
+        //    sql += "INNER JOIN sys.schemas S ON S.schema_id = FC.principal_id";
+        //    return sql;
+        //}
 
         public void Fill(Database database, string connectionString)
         {
@@ -31,7 +29,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    using (SqlCommand command = new SqlCommand(GetSQL(), conn))
+                    using (SqlCommand command = new SqlCommand(FullTextSQLCommand.Get(database.Info.Version), conn))
                     {
                         conn.Open();
                         using (SqlDataReader reader = command.ExecuteReader())

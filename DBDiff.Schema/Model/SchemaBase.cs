@@ -1,14 +1,14 @@
 using System;
 using System.Collections;
-using System.Text;
-using System.Reflection;
 using System.Diagnostics;
 
 namespace DBDiff.Schema.Model
 {
     [DebuggerDisplay("Id: {Id} - Name: {Name} - Status: {status}")]
+    
     public abstract class SchemaBase:ISchemaBase
     {
+        
         private Enums.ObjectStatusType status;
         private Enums.ObjectType type;
         private ISchemaBase parent;

@@ -5,6 +5,7 @@ using DBDiff.Schema.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Model
 {
+    
     public class Table : SQLServerSchemaBase, IComparable<Table>, ITable<Table>
     {
         private Columns<Table> columns;

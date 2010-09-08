@@ -1,11 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using System.Globalization;
-using System.Text;
 using System.Data.SqlClient;
-using DBDiff.Schema.Events;
-using DBDiff.Schema.SQLServer.Generates.Options;
 using DBDiff.Schema.SQLServer.Generates.Model;
 
 namespace DBDiff.Schema.SQLServer.Generates.Generates
@@ -30,6 +23,7 @@ namespace DBDiff.Schema.SQLServer.Generates.Generates
 
         public void Fill(Database database, string connectionString)
         {
+            if (database.Info.Version == DatabaseInfo.VersionNumber.SQLServer2000) return;
             if (database.Options.Ignore.FilterDDLTriggers)
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
